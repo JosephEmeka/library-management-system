@@ -1,8 +1,11 @@
 package elibrary.services;
 
+import elibrary.data.model.User;
 import elibrary.data.repository.UserRepository;
+import elibrary.dtos_requests.LogOutRequest;
+import elibrary.dtos_requests.LoginRequest;
 import elibrary.dtos_requests.RegisterRequest;
-import elibrary.exceptions.EmptyUserNameRegistrationException;
+import elibrary.exceptions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -200,6 +203,114 @@ class UserServicesImplementationTest {
         Optional<User> findUser = userRepository.findByUserName("google-man");
         assertTrue(findUser.isPresent());
         assertThrows(WrongPasswordException.class, ()->userServicesImplementation.loginUser(newLoginRequest));
+    }
+
+    @Test
+    void testUserCanBeLoggedInWithEmptyUserName(){
+        userRepository.deleteAll();
+        var userServicesImplementation = new UserServicesImplementation(userRepository);
+        RegisterRequest newUserRegistrationRequest = new RegisterRequest();
+        newUserRegistrationRequest.setFirstName("Johnny");
+        newUserRegistrationRequest.setLastName("Joe");
+        newUserRegistrationRequest.setUserName("google-man");
+        newUserRegistrationRequest.setEmail("google-man@gmail.com");
+        newUserRegistrationRequest.setPassword("PASSWORD");
+        userServicesImplementation.registerUser(newUserRegistrationRequest);
+
+        LoginRequest newLoginRequest = new LoginRequest();
+        newLoginRequest.setUsername("");
+        newLoginRequest.setPassword("PASSWORD");
+        Optional<User> findUser = userRepository.findByUserName("google-man");
+        assertTrue(findUser.isPresent());
+        assertThrows(EmptyUserNameLoginException.class, ()->userServicesImplementation.loginUser(newLoginRequest));
+    }
+
+    @Test
+    void testUserCanBeLoggedInWithWhiteSpaceUserName(){
+        userRepository.deleteAll();
+        var userServicesImplementation = new UserServicesImplementation(userRepository);
+        RegisterRequest newUserRegistrationRequest = new RegisterRequest();
+        newUserRegistrationRequest.setFirstName("Johnny");
+        newUserRegistrationRequest.setLastName("Joe");
+        newUserRegistrationRequest.setUserName("google-man");
+        newUserRegistrationRequest.setEmail("google-man@gmail.com");
+        newUserRegistrationRequest.setPassword("PASSWORD");
+        userServicesImplementation.registerUser(newUserRegistrationRequest);
+
+        LoginRequest newLoginRequest = new LoginRequest();
+        newLoginRequest.setUsername(" ");
+        newLoginRequest.setPassword("PASSWORD");
+        Optional<User> findUser = userRepository.findByUserName("google-man");
+        assertTrue(findUser.isPresent());
+        assertThrows(WhiteSpaceException.class, ()->userServicesImplementation.loginUser(newLoginRequest));
+    }
+
+    @Test
+    void testUserCanBeLoggedInWithEmptyPassword(){
+        userRepository.deleteAll();
+        var userServicesImplementation = new UserServicesImplementation(userRepository);
+        RegisterRequest newUserRegistrationRequest = new RegisterRequest();
+        newUserRegistrationRequest.setFirstName("Johnny");
+        newUserRegistrationRequest.setLastName("Joe");
+        newUserRegistrationRequest.setUserName("google-man");
+        newUserRegistrationRequest.setEmail("google-man@gmail.com");
+        newUserRegistrationRequest.setPassword("PASSWORD");
+        userServicesImplementation.registerUser(newUserRegistrationRequest);
+
+        LoginRequest newLoginRequest = new LoginRequest();
+        newLoginRequest.setUsername("google-man");
+        newLoginRequest.setPassword("");
+        Optional<User> findUser = userRepository.findByUserName("google-man");
+        assertTrue(findUser.isPresent());
+        assertThrows(EmptyPasswordLoginException.class, ()->userServicesImplementation.loginUser(newLoginRequest));
+    }
+
+    @Test
+    void testUserCanBeLoggedInWithWhiteSpacePassword(){
+        userRepository.deleteAll();
+        var userServicesImplementation = new UserServicesImplementation(userRepository);
+        RegisterRequest newUserRegistrationRequest = new RegisterRequest();
+        newUserRegistrationRequest.setFirstName("Johnny");
+        newUserRegistrationRequest.setLastName("Joe");
+        newUserRegistrationRequest.setUserName("google-man");
+        newUserRegistrationRequest.setEmail("google-man@gmail.com");
+        newUserRegistrationRequest.setPassword("PASSWORD");
+        userServicesImplementation.registerUser(newUserRegistrationRequest);
+
+        LoginRequest newLoginRequest = new LoginRequest();
+        newLoginRequest.setUsername("google-man");
+        newLoginRequest.setPassword(" ");
+        Optional<User> findUser = userRepository.findByUserName("google-man");
+        assertTrue(findUser.isPresent());
+        assertThrows(WhiteSpaceException.class, ()->userServicesImplementation.loginUser(newLoginRequest));
+    }
+
+    @Test
+    void testUserIsLoggedInAfterRegistration_UserCanLogOut(){
+        userRepository.deleteAll();
+        LoginRequest newLoginRequest = new LoginRequest();
+        newLoginRequest.setUsername("google-man");
+        newLoginRequest.setPassword("PASSWORD");
+        UserServicesImplementation userServicesImplementation = new UserServicesImplementation(userRepository);
+        Optional<User> findUser = userRepository.findByUserName("google-man");
+        assertFalse(findUser.isPresent());
+        assertThrows(NoSuchElementException.class, ()->userServicesImplementation.loginUser(newLoginRequest));
+        RegisterRequest newUserRegistrationRequest = new RegisterRequest();
+        newUserRegistrationRequest.setFirstName("Johnny");
+        newUserRegistrationRequest.setLastName("Joe");
+        newUserRegistrationRequest.setUserName("google-man");
+        newUserRegistrationRequest.setEmail("google-man@gmail.com");
+        newUserRegistrationRequest.setPassword("PASSWORD");
+
+        userServicesImplementation.registerUser(newUserRegistrationRequest);
+        assertEquals(1, userRepository.count());
+        userServicesImplementation.loginUser(newLoginRequest);
+        assertTrue(userRepository.findByUserName("google-man").get().getIsLoggedIn());
+        LogOutRequest newLogOutRequest = new LogOutRequest();
+        newLogOutRequest.setUsername("google-man");
+        newLogOutRequest.setPassword("PASSWORD");
+        userServicesImplementation.logoutUser(newLogOutRequest);
+        assertFalse(userRepository.findByUserName("google-man").get().getIsLoggedIn());
     }
 }
 

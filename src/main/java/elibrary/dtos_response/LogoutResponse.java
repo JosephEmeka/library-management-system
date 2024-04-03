@@ -2,12 +2,9 @@ package elibrary.dtos_response;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
-
 @Data
-public class RegisterResponse {
+public class LogoutResponse {
     private String userName;
     private String id;
-    private LocalDateTime dateRegistered;
+
 }
