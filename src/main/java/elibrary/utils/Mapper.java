@@ -1,13 +1,16 @@
 package elibrary.utils;
 
 import elibrary.data.model.Admin;
+import elibrary.data.model.Book;
 import elibrary.data.model.User;
+import elibrary.dtos_requests.BookRegisterRequest;
 import elibrary.dtos_requests.LogOutRequest;
 import elibrary.dtos_requests.LoginRequest;
 import elibrary.dtos_requests.RegisterRequest;
-import elibrary.dtos_response.LoginResponse;
-import elibrary.dtos_response.LogoutResponse;
-import elibrary.dtos_response.RegisterResponse;
+import elibrary.dtos_response.*;
+import elibrary.enums.Categories;
+
+import java.util.Optional;
 
 public class Mapper {
     public static User RegisterRequestMap(RegisterRequest newUserRegistrationRequest) {
@@ -72,6 +75,8 @@ public class Mapper {
         return response;
     }
 
+
+
     public static Admin adminLoginMap(LoginRequest loginRequest){
         Admin admin = new Admin();
         admin.setUsername(loginRequest.getUsername());
@@ -85,7 +90,31 @@ public class Mapper {
         userLoginResponse.setId(admin.getAdminId());
         return userLoginResponse;
     }
+
+    public static Book bookRequestMap(BookRegisterRequest newBookRegistrationRequest) {
+        Book book = new Book();
+        book.setTitle(newBookRegistrationRequest.getTitle());
+        book.setAuthor(newBookRegistrationRequest.getAuthor());
+        book.setPublisher(newBookRegistrationRequest.getPublisher());
+        book.setIsbn(newBookRegistrationRequest.getIsbn());
+        book.setCategory(newBookRegistrationRequest.getCategory());
+        return book;
     }
+
+    public static BookRegisterResponse bookRegisterResponseMap(Book newBook) {
+        BookRegisterResponse newResponse = new BookRegisterResponse();
+        newResponse.setAuthor(newBook.getAuthor());
+        newResponse.setTitle(newBook.getTitle());
+        newResponse.setAvailable(newBook.isAvailable());
+        return newResponse;
+    }
+
+
+    public static BookDeleteResponse deleteResponseMap(Book book) {
+        return null;
+    }
+
+}
 
 
 

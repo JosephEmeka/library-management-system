@@ -98,15 +98,7 @@ public class UserServicesImplementation implements UserServices{
     }
 
     private void validateLogoutRequest(LogOutRequest logOutRequest, User user) {
-        if (logOutRequest.getUsername() == null || logOutRequest.getUsername().isEmpty()) {
-            throw new EmptyUserNameLoginException("User name cannot be empty.");
-        }
-        if (logOutRequest.getPassword() == null || logOutRequest.getPassword().isEmpty()) {
-            throw new EmptyPasswordLoginException("Password cannot be empty.");
-        }
-        if (logOutRequest.getUsername().equals(" ") || logOutRequest.getPassword().equals(" ")) {
-            throw new WhiteSpaceException("User cannot enter white Space");
-        }
+        AdminServicesImplementation.requestCheck(logOutRequest.getUsername(), logOutRequest.getPassword());
         Optional<User> existingUserOptional = userRepository.findByUserName(user.getUserName());
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
