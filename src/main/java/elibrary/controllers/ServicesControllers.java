@@ -1,9 +1,6 @@
 package elibrary.controllers;
 
-import elibrary.dtos_requests.BookRegisterRequest;
-import elibrary.dtos_requests.LogOutRequest;
-import elibrary.dtos_requests.LoginRequest;
-import elibrary.dtos_requests.RegisterRequest;
+import elibrary.dtos_requests.*;
 import elibrary.dtos_response.ApiResponse;
 import elibrary.services.AdminServicesImplementation;
 import elibrary.services.UserServicesImplementation;
@@ -20,12 +17,13 @@ public class ServicesControllers {
     @RequestMapping("/elibrary")
     public static class BlogServicesController {
         private final UserServicesImplementation userServices;
-        private AdminServicesImplementation adminServicesImplementation;
+        private final AdminServicesImplementation adminServicesImplementation;
 
-        @Autowired
-        public BlogServicesController(UserServicesImplementation userServicesImplementation) {
-            this.userServices = userServicesImplementation;
+        public BlogServicesController(UserServicesImplementation userServices, AdminServicesImplementation adminServicesImplementation) {
+            this.userServices = userServices;
+            this.adminServicesImplementation = adminServicesImplementation;
         }
+
 
         @PostMapping("/register")
         public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
@@ -75,9 +73,9 @@ public class ServicesControllers {
         }
 
         @DeleteMapping ("/removeBook")
-        public ResponseEntity<?> deleteBook(@RequestBody BookRegisterRequest bookRegisterRequest) {
+        public ResponseEntity<?> deleteBook(@RequestBody BookDeleteRequest bookDeleteRequest) {
             try {
-                var result = adminServicesImplementation.removeBookByTitleAndAuthor(bookRegisterRequest);
+                var result = adminServicesImplementation.removeBookByTitleAndAuthor(bookDeleteRequest);
                 return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
             } catch (Exception e) {
                 return new ResponseEntity<>(new ApiResponse(false, e.getMessage()),

@@ -4,6 +4,7 @@ import elibrary.data.model.Admin;
 import elibrary.data.model.Book;
 import elibrary.data.repository.AdminRepository;
 import elibrary.data.repository.BookRepository;
+import elibrary.dtos_requests.BookDeleteRequest;
 import elibrary.dtos_requests.BookRegisterRequest;
 import elibrary.dtos_requests.LoginRequest;
 import elibrary.dtos_requests.RegisterRequest;
@@ -125,8 +126,8 @@ public class AdminServicesImplementation implements AdminServices {
         }
     }
 
-    public BookDeleteResponse removeBookByTitleAndAuthor(BookRegisterRequest Book) {
-        Book book = bookRequestMap(Book);
+    public BookDeleteResponse removeBookByTitleAndAuthor(BookDeleteRequest bookDeleteRequest) {
+        Book book = bookDeleteRequestMap(bookDeleteRequest);
         if (book.getTitle() == null || book.getTitle().trim().isEmpty() || book.getAuthor() == null || book.getAuthor().trim().isEmpty()) {
             throw new IllegalArgumentException("Title and author cannot be null or empty.");
         }
@@ -137,10 +138,11 @@ public class AdminServicesImplementation implements AdminServices {
         } else {
             throw new BookNotFoundException("Book with title \"" + book.getTitle() + "\" and author \"" + book.getAuthor() + "\" not found.");
         }
-        return deleteResponseMap(boo);
+        return deleteResponseMap(book);
     }
 
-   
+
+
 
 }
 

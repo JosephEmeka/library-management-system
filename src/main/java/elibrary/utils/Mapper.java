@@ -3,14 +3,8 @@ package elibrary.utils;
 import elibrary.data.model.Admin;
 import elibrary.data.model.Book;
 import elibrary.data.model.User;
-import elibrary.dtos_requests.BookRegisterRequest;
-import elibrary.dtos_requests.LogOutRequest;
-import elibrary.dtos_requests.LoginRequest;
-import elibrary.dtos_requests.RegisterRequest;
+import elibrary.dtos_requests.*;
 import elibrary.dtos_response.*;
-import elibrary.enums.Categories;
-
-import java.util.Optional;
 
 public class Mapper {
     public static User RegisterRequestMap(RegisterRequest newUserRegistrationRequest) {
@@ -111,9 +105,18 @@ public class Mapper {
 
 
     public static BookDeleteResponse deleteResponseMap(Book book) {
-        return null;
+        BookDeleteResponse deleteResponse = new BookDeleteResponse();
+        deleteResponse.setBookAuthor(book.getAuthor());
+        deleteResponse.setBookTitle(book.getTitle());
+        return deleteResponse;
     }
-
+    public static Book bookDeleteRequestMap(BookDeleteRequest bookDeleteRequest) {
+        Book book = new Book();
+        book.setTitle(bookDeleteRequest.getTitle());
+        book.setAuthor(bookDeleteRequest.getAuthor());
+        book.setCategory(bookDeleteRequest.getBookCategory());
+        return book;
+    }
 }
 
 
