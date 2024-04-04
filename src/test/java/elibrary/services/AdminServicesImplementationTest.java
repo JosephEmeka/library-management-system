@@ -2,6 +2,7 @@ package elibrary.services;
 
 import elibrary.data.model.Admin;
 import elibrary.data.repository.AdminRepository;
+import elibrary.dtos_requests.BookRegisterRequest;
 import elibrary.dtos_requests.LoginRequest;
 import elibrary.dtos_requests.RegisterRequest;
 import elibrary.exceptions.*;
@@ -250,14 +251,24 @@ class AdminServicesImplementationTest {
 
     private static AdminServicesImplementation getAdminServicesImplementation(AdminRepository adminRepository) {
         AdminServicesImplementation newAdminServicesImplementation = new AdminServicesImplementation(adminRepository);
-        RegisterRequest newUserRegistrationRequest = new RegisterRequest();
-        newUserRegistrationRequest.setFirstName("Johnny");
-        newUserRegistrationRequest.setLastName("Joe");
-        newUserRegistrationRequest.setUserName("google-man");
-        newUserRegistrationRequest.setEmail("google-man@gmail.com");
-        newUserRegistrationRequest.setPassword("PASSWORD");
-        newAdminServicesImplementation.registerAdmin(newUserRegistrationRequest);
+        RegisterRequest newAdminRegistrationRequest = new RegisterRequest();
+        newAdminRegistrationRequest.setFirstName("Johnny");
+        newAdminRegistrationRequest.setLastName("Joe");
+        newAdminRegistrationRequest.setUserName("google-man");
+        newAdminRegistrationRequest.setEmail("google-man@gmail.com");
+        newAdminRegistrationRequest.setPassword("PASSWORD");
+        newAdminServicesImplementation.registerAdmin(newAdminRegistrationRequest);
         return newAdminServicesImplementation;
+    }
+
+    @Test
+    void testThatAdminCanUploadBooks(){
+        AdminServicesImplementation newAdminServicesImplementation = new AdminServicesImplementation(adminRepository);
+       var newBookRegistrationRequest = new BookRegisterRequest();
+       newBookRegistrationRequest.setAuthor("Author");
+       newBookRegistrationRequest.setTitle("Title");
+
+        newAdminServicesImplementation.uploadBooks();
     }
 
 }
