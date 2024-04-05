@@ -4,6 +4,7 @@ import elibrary.dtos_requests.*;
 import elibrary.dtos_response.ApiResponse;
 import elibrary.services.AdminServicesImplementation;
 import elibrary.services.UserServicesImplementation;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +18,10 @@ public class ServicesControllers {
     @RequestMapping("/elibrary")
     public static class BlogServicesController {
         private final UserServicesImplementation userServices;
-        private final AdminServicesImplementation adminServicesImplementation;
 
-        public BlogServicesController(UserServicesImplementation userServices, AdminServicesImplementation adminServicesImplementation) {
+        @Autowired
+        public BlogServicesController(UserServicesImplementation userServices) {
             this.userServices = userServices;
-            this.adminServicesImplementation = adminServicesImplementation;
         }
 
 
@@ -59,28 +59,6 @@ public class ServicesControllers {
             }
 
         }
-
-
-        @PostMapping("/addBook")
-        public ResponseEntity<?> addBook(@RequestBody BookRegisterRequest bookRegisterRequest) {
-            try {
-                var result = adminServicesImplementation.addBooks(bookRegisterRequest);
-                return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
-            } catch (Exception e) {
-                return new ResponseEntity<>(new ApiResponse(false, e.getMessage()),
-                        BAD_REQUEST);
-            }
-        }
-
-        @DeleteMapping ("/removeBook")
-        public ResponseEntity<?> deleteBook(@RequestBody BookDeleteRequest bookDeleteRequest) {
-            try {
-                var result = adminServicesImplementation.removeBookByTitleAndAuthor(bookDeleteRequest);
-                return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
-            } catch (Exception e) {
-                return new ResponseEntity<>(new ApiResponse(false, e.getMessage()),
-                        BAD_REQUEST);
-            }
-        }
+        
     }
 }

@@ -9,11 +9,12 @@ public class ApiResponse {
     private boolean isSuccessful;
     private Object data;
 
-    @Data
-    public static class RegisterRequestApiResponse {
-        private String userName;
-        private String id;
 
-
+@Data
+@AllArgsConstructor
+public  static class RegisterRequestApiResponse {
+    private String userName;
+    private String id;
+    private String firstName;
     }
 }
