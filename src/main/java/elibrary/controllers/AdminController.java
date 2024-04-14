@@ -11,19 +11,49 @@ import org.springframework.web.bind.annotation.*;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
-
+@RestController
+@RequestMapping("/elibrary")
 public class AdminController {
-    @RestController
-    @RequestMapping("/elibrary")
-    public static class BlogServicesController {
-
         private final AdminServicesImplementation adminServicesImplementation;
         @Autowired
-        public BlogServicesController( AdminServicesImplementation adminServicesImplementation) {
+        public  AdminController(AdminServicesImplementation adminServicesImplementation) {
             this.adminServicesImplementation = adminServicesImplementation;
         }
 
+    @PostMapping("/registerAdmin")
+    public ResponseEntity<?> registerAdmin(@RequestBody RegisterRequest registerRequest) {
+        try {
+            var result = adminServicesImplementation.registerAdmin(registerRequest);
+            return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()),
+                    BAD_REQUEST);
+        }
+    }
 
+    @PatchMapping("/loginAdmin")
+    public ResponseEntity<?> loginAdmin(@RequestBody LoginRequest loginRequest) {
+        try {
+            var result = adminServicesImplementation.loginAdmin(loginRequest);
+            return new ResponseEntity<>(new ApiResponse(true, result), CONTINUE);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()),
+                    BAD_REQUEST);
+        }
+    }
+
+
+    @PostMapping("/logoutAdmin")
+    public ResponseEntity<?> logoutAdmin(@RequestBody LogOutAdminRequest logOutRequest) {
+        try {
+            var result = adminServicesImplementation.logoutAdmin(logOutRequest);
+            return new ResponseEntity<>(new ApiResponse(true, result), OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()),
+                    BAD_REQUEST);
+        }
+
+    }
 
         @PostMapping("/addBook")
         public ResponseEntity<?> addBook(@RequestBody BookRegisterRequest bookRegisterRequest) {
@@ -39,7 +69,7 @@ public class AdminController {
         @DeleteMapping ("/removeBook")
         public ResponseEntity<?> deleteBook(@RequestBody BookDeleteRequest bookDeleteRequest) {
             try {
-                var result = adminServicesImplementation.removeBookByTitleAndAuthor(bookDeleteRequest);
+                var result = adminServicesImplementation.deleteBooks(bookDeleteRequest);
                 return new ResponseEntity<>(new ApiResponse(true, result), GONE);
             } catch (Exception e) {
                 return new ResponseEntity<>(new ApiResponse(false, e.getMessage()),
@@ -47,5 +77,5 @@ public class AdminController {
             }
         }
     }
-}
+
 

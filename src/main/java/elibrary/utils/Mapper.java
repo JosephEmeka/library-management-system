@@ -2,6 +2,7 @@ package elibrary.utils;
 
 import elibrary.data.model.Admin;
 import elibrary.data.model.Book;
+import elibrary.data.model.BorrowedBooks;
 import elibrary.data.model.User;
 import elibrary.dtos_requests.*;
 import elibrary.dtos_response.*;
@@ -115,7 +116,51 @@ public class Mapper {
         book.setTitle(bookDeleteRequest.getTitle());
         book.setAuthor(bookDeleteRequest.getAuthor());
         book.setCategory(bookDeleteRequest.getBookCategory());
+        book.setIsbn(bookDeleteRequest.getIsbn());
         return book;
+    }
+
+    public static Admin adminLoginOutMap(LogOutAdminRequest loginOutAdminRequest){
+        Admin admin = new Admin();
+        admin.setUsername(loginOutAdminRequest.getUsername());
+        admin.setPassword(loginOutAdminRequest.getPassword());
+        return admin;
+    }
+    public static LogoutAdminResponse logOutAdminResponseMap(Admin admin){
+        LogoutAdminResponse logoutAdminResponse = new LogoutAdminResponse();
+        logoutAdminResponse.setUserName(admin.getUsername());
+       logoutAdminResponse.setId(admin.getAdminId());
+        return  logoutAdminResponse;
+    }
+
+
+    public static BorrowedBooks borrowedBookRequestMap(BorrowedBookRegisterRequest borrowedBookRegisterRequest){
+        BorrowedBooks borrowedBook = new BorrowedBooks();
+        borrowedBook.setTitle(borrowedBookRegisterRequest.getTitle());
+        borrowedBook.setAuthor(borrowedBookRegisterRequest.getAuthor());
+        borrowedBook.setBorrowedDate(borrowedBookRegisterRequest.getBorrowedDate());
+        borrowedBook.setDueDate(borrowedBookRegisterRequest.getDueDate());
+        borrowedBook.setBorrowerUsername(borrowedBookRegisterRequest.getBorrowerUserName());
+        return borrowedBook;
+    }
+
+    public static BorrowedBookRegisterResponse borrowedBookRegisterResponseMap(BorrowedBooks borrowedBook){
+        BorrowedBookRegisterResponse borrowedBookRegisterResponse = new BorrowedBookRegisterResponse();
+        borrowedBookRegisterResponse.setAuthor(borrowedBook.getAuthor());
+        borrowedBookRegisterResponse.setTitle(borrowedBook.getTitle());
+        borrowedBookRegisterResponse.setBorrowerUserName(borrowedBook.getBorrowerUsername());
+        borrowedBookRegisterResponse.setBorrowedDate(borrowedBook.getBorrowedDate());
+        borrowedBookRegisterResponse.setDueDate(borrowedBook.getDueDate());
+        return borrowedBookRegisterResponse;
+
+    }
+
+    public static BorrowedBookDeleteResponse borrowedBookDeleteResponseMap(BorrowedBooks borrowedBooks){
+        BorrowedBookDeleteResponse borrowedBookDeleteResponse = new BorrowedBookDeleteResponse();
+        borrowedBookDeleteResponse.setAuthor(borrowedBooks.getAuthor());
+        borrowedBookDeleteResponse.setTitle(borrowedBooks.getTitle());
+        return borrowedBookDeleteResponse;
+
     }
 }
 

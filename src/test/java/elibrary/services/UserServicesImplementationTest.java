@@ -1,6 +1,7 @@
 package elibrary.services;
 
 import elibrary.data.model.User;
+import elibrary.data.repository.BookRepository;
 import elibrary.data.repository.UserRepository;
 import elibrary.dtos_requests.LogOutRequest;
 import elibrary.dtos_requests.LoginRequest;
@@ -10,15 +11,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import java.util.NoSuchElementException;
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class UserServicesImplementationTest {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private BookRepository bookRepository;
+
 
     @BeforeEach
     void setUp() {
@@ -188,14 +190,7 @@ class UserServicesImplementationTest {
     @Test
     void testUserCanBeLoggedInWithWrongPassword(){
         userRepository.deleteAll();
-        UserServicesImplementation userServicesImplementation = new UserServicesImplementation(userRepository);
-        RegisterRequest newUserRegistrationRequest = new RegisterRequest();
-        newUserRegistrationRequest.setFirstName("Johnny");
-        newUserRegistrationRequest.setLastName("Joe");
-        newUserRegistrationRequest.setUserName("google-man");
-        newUserRegistrationRequest.setEmail("google-man@gmail.com");
-        newUserRegistrationRequest.setPassword("PASSWORD");
-        userServicesImplementation.registerUser(newUserRegistrationRequest);
+        UserServicesImplementation userServicesImplementation = getServicesImplementation();
 
         LoginRequest newLoginRequest = new LoginRequest();
         newLoginRequest.setUsername("google-man");
@@ -208,14 +203,7 @@ class UserServicesImplementationTest {
     @Test
     void testUserCanBeLoggedInWithEmptyUserName(){
         userRepository.deleteAll();
-        var userServicesImplementation = new UserServicesImplementation(userRepository);
-        RegisterRequest newUserRegistrationRequest = new RegisterRequest();
-        newUserRegistrationRequest.setFirstName("Johnny");
-        newUserRegistrationRequest.setLastName("Joe");
-        newUserRegistrationRequest.setUserName("google-man");
-        newUserRegistrationRequest.setEmail("google-man@gmail.com");
-        newUserRegistrationRequest.setPassword("PASSWORD");
-        userServicesImplementation.registerUser(newUserRegistrationRequest);
+        var userServicesImplementation = getUserServicesImplementation();
 
         LoginRequest newLoginRequest = new LoginRequest();
         newLoginRequest.setUsername("");
@@ -228,14 +216,7 @@ class UserServicesImplementationTest {
     @Test
     void testUserCanBeLoggedInWithWhiteSpaceUserName(){
         userRepository.deleteAll();
-        var userServicesImplementation = new UserServicesImplementation(userRepository);
-        RegisterRequest newUserRegistrationRequest = new RegisterRequest();
-        newUserRegistrationRequest.setFirstName("Johnny");
-        newUserRegistrationRequest.setLastName("Joe");
-        newUserRegistrationRequest.setUserName("google-man");
-        newUserRegistrationRequest.setEmail("google-man@gmail.com");
-        newUserRegistrationRequest.setPassword("PASSWORD");
-        userServicesImplementation.registerUser(newUserRegistrationRequest);
+        var userServicesImplementation = getUserServicesImplementation();
 
         LoginRequest newLoginRequest = new LoginRequest();
         newLoginRequest.setUsername(" ");
@@ -248,14 +229,7 @@ class UserServicesImplementationTest {
     @Test
     void testUserCanBeLoggedInWithEmptyPassword(){
         userRepository.deleteAll();
-        var userServicesImplementation = new UserServicesImplementation(userRepository);
-        RegisterRequest newUserRegistrationRequest = new RegisterRequest();
-        newUserRegistrationRequest.setFirstName("Johnny");
-        newUserRegistrationRequest.setLastName("Joe");
-        newUserRegistrationRequest.setUserName("google-man");
-        newUserRegistrationRequest.setEmail("google-man@gmail.com");
-        newUserRegistrationRequest.setPassword("PASSWORD");
-        userServicesImplementation.registerUser(newUserRegistrationRequest);
+        var userServicesImplementation = getUserServicesImplementation();
 
         LoginRequest newLoginRequest = new LoginRequest();
         newLoginRequest.setUsername("google-man");
@@ -268,6 +242,17 @@ class UserServicesImplementationTest {
     @Test
     void testUserCanBeLoggedInWithWhiteSpacePassword(){
         userRepository.deleteAll();
+        var userServicesImplementation = getUserServicesImplementation();
+
+        LoginRequest newLoginRequest = new LoginRequest();
+        newLoginRequest.setUsername("google-man");
+        newLoginRequest.setPassword(" ");
+        Optional<User> findUser = userRepository.findByUserName("google-man");
+        assertTrue(findUser.isPresent());
+        assertThrows(WhiteSpaceException.class, ()->userServicesImplementation.loginUser(newLoginRequest));
+    }
+
+    private UserServicesImplementation getUserServicesImplementation() {
         var userServicesImplementation = new UserServicesImplementation(userRepository);
         RegisterRequest newUserRegistrationRequest = new RegisterRequest();
         newUserRegistrationRequest.setFirstName("Johnny");
@@ -276,13 +261,7 @@ class UserServicesImplementationTest {
         newUserRegistrationRequest.setEmail("google-man@gmail.com");
         newUserRegistrationRequest.setPassword("PASSWORD");
         userServicesImplementation.registerUser(newUserRegistrationRequest);
-
-        LoginRequest newLoginRequest = new LoginRequest();
-        newLoginRequest.setUsername("google-man");
-        newLoginRequest.setPassword(" ");
-        Optional<User> findUser = userRepository.findByUserName("google-man");
-        assertTrue(findUser.isPresent());
-        assertThrows(WhiteSpaceException.class, ()->userServicesImplementation.loginUser(newLoginRequest));
+        return userServicesImplementation;
     }
 
     @Test
@@ -311,6 +290,46 @@ class UserServicesImplementationTest {
         newLogOutRequest.setPassword("PASSWORD");
         userServicesImplementation.logoutUser(newLogOutRequest);
         assertFalse(userRepository.findByUserName("google-man").get().getIsLoggedIn());
+    }
+
+//    @Test
+//    void testUserCanViewAllBorrowedBooks(){
+//        userRepository.deleteAll();
+//        UserServicesImplementation userServicesImplementation = getServicesImplementation();
+//        assertEquals(1, userRepository.count());
+//        LoginRequest newLoginRequest = new LoginRequest();
+//        newLoginRequest.setUsername("google-man");
+//        newLoginRequest.setPassword("PASSWORD");
+//        userServicesImplementation.loginUser(newLoginRequest);
+//        assertTrue(userRepository.findByUserName("google-man").get().getIsLoggedIn());
+//        var newBookRegistrationRequest = new BookRegisterRequest();
+//        newBookRegistrationRequest.setAuthor("Author");
+//        newBookRegistrationRequest.setTitle("Title");
+//        newBookRegistrationRequest.setPublisher("johnson & johnson");
+//        newBookRegistrationRequest.setIsbn("23bnn432");
+//        newBookRegistrationRequest.setCategory(Categories.MYSTERY);
+//        userServicesImplementation.borrowBooks(newBookRegistrationRequest);
+//        var secondBookRegistrationRequest = new BookRegisterRequest();
+//        secondBookRegistrationRequest.setAuthor("Sam");
+//        secondBookRegistrationRequest.setTitle("The Little Mermaid");
+//        secondBookRegistrationRequest.setPublisher("johnson & johnson");
+//        secondBookRegistrationRequest.setIsbn("23bnR432");
+//        secondBookRegistrationRequest.setCategory(Categories.SCIENCE_FICTION);
+//        userServicesImplementation.borrowBooks(secondBookRegistrationRequest);
+//        assertEquals(2, bookRepository.count());
+//        assertEquals(userServicesImplementation.getAllBooks(), bookRepository.findAll());
+//    }
+
+    private UserServicesImplementation getServicesImplementation() {
+        UserServicesImplementation userServicesImplementation = new UserServicesImplementation(userRepository);
+        RegisterRequest newUserRegistrationRequest = new RegisterRequest();
+        newUserRegistrationRequest.setFirstName("Johnny");
+        newUserRegistrationRequest.setLastName("Joe");
+        newUserRegistrationRequest.setUserName("google-man");
+        newUserRegistrationRequest.setEmail("google-man@gmail.com");
+        newUserRegistrationRequest.setPassword("PASSWORD");
+        userServicesImplementation.registerUser(newUserRegistrationRequest);
+        return userServicesImplementation;
     }
 }
 

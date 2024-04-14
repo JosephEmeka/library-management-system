@@ -2,16 +2,11 @@ package elibrary.services;
 
 import elibrary.data.model.Admin;
 import elibrary.data.model.Book;
+import elibrary.data.model.User;
 import elibrary.data.repository.AdminRepository;
 import elibrary.data.repository.BookRepository;
-import elibrary.dtos_requests.BookDeleteRequest;
-import elibrary.dtos_requests.BookRegisterRequest;
-import elibrary.dtos_requests.LoginRequest;
-import elibrary.dtos_requests.RegisterRequest;
-import elibrary.dtos_response.BookDeleteResponse;
-import elibrary.dtos_response.BookRegisterResponse;
-import elibrary.dtos_response.LoginResponse;
-import elibrary.dtos_response.RegisterResponse;
+import elibrary.dtos_requests.*;
+import elibrary.dtos_response.*;
 import elibrary.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,11 +21,12 @@ import static elibrary.utils.Mapper.*;
 public class AdminServicesImplementation implements AdminServices {
    private final AdminRepository adminRepository;
    private final BookRepository bookRepository;
-@Autowired
+
+    @Autowired
     public AdminServicesImplementation(AdminRepository adminRepository, BookRepository bookRepository) {
         this.adminRepository = adminRepository;
-    this.bookRepository = bookRepository;
-}
+        this.bookRepository = bookRepository;
+    }
 
     @Override
 
@@ -65,31 +61,35 @@ public class AdminServicesImplementation implements AdminServices {
 
     @Override
     public LoginResponse loginAdmin(LoginRequest loginRequest) {
-       Admin admin = adminLoginMap(loginRequest);
-        validateLoginRequest(loginRequest, admin);
+        Admin admin = validateLoginRequest(loginRequest);
+        admin.setIsLoggedIn(true);
+        adminRepository.save(  admin);
         return adminLoginResponseMap(admin);
     }
 
-    private void validateLoginRequest(LoginRequest loginRequest, Admin admin) {
+
+
+    private Admin validateLoginRequest(LoginRequest loginRequest) {
         requestCheck(loginRequest.getUsername(), loginRequest.getPassword());
-        Optional<Admin> existingAdminOptional = adminRepository.findByUsername(admin.getUsername());
+        Optional<Admin> existingAdminOptional = adminRepository.findByUsername(loginRequest.getUsername());
+
         if (existingAdminOptional.isPresent()) {
-            Admin existingUser = existingAdminOptional.get();
-            if (!Objects.equals(existingUser.getPassword(), loginRequest.getPassword())) {
-                throw new WrongPasswordException("Account does not exist or Invalid password");
+
+            if (existingAdminOptional.get().getIsLoggedIn()){
+                throw new AlreadyLoggedInException("Already logged in");
             }
-            existingUser.setIsLoggedIn(true);
-            adminRepository.save(existingUser);
+            if (!Objects.equals(existingAdminOptional.get().getPassword(), loginRequest.getPassword())) {
+                throw new WrongPasswordException("Invalid password");
+            }
+            return existingAdminOptional.get();
+        } else {
+            throw new NoSuchElementException("User not found.");
         }
-        else
-        {
-            throw new NoSuchElementException("User not found");
-        }
-
-
     }
 
-     static void requestCheck(String username, String password) {
+
+
+    static void requestCheck(String username, String password) {
         if (username == null || username.isEmpty()) {
             throw new EmptyUserNameLoginException("User name cannot be empty.");
         }
@@ -102,47 +102,37 @@ public class AdminServicesImplementation implements AdminServices {
     }
 
     public BookRegisterResponse addBooks(BookRegisterRequest newBookRegistrationRequest) {
-    Book newBook = bookRequestMap(newBookRegistrationRequest);
-    validateBook(newBook);
-    bookRepository.save(newBook);
-    return bookRegisterResponseMap(newBook);
+        BookServicesImplementation bookServicesImplementation = new BookServicesImplementation(bookRepository);
+        bookServicesImplementation.addBook(newBookRegistrationRequest);
+        Optional<Book> newOptionalBook = bookRepository.findByTitleAndAuthor(newBookRegistrationRequest.getTitle(), newBookRegistrationRequest.getAuthor());
+        var newBook = newOptionalBook.get();
+        return bookRegisterResponseMap(newBook);
     }
 
-
-
-
-    private void validateBook(Book book){
-        if ((book.getAuthor() == null) || book.getAuthor().isEmpty() || book.getTitle().isEmpty() || book.getPublisher().isEmpty() || book.getCategory().getDisplayName().isEmpty()) {
-            throw new EmptyRegistrationEntryException("Author name cannot be empty.");
-        }
-        if (book.getAuthor().equals(" ") || book.getTitle().equals(" ") || book.getPublisher().equals(" ") || book.getCategory().getDisplayName().equals(" ")) {
-            throw new WhiteSpaceException("User cannot enter white Space");
-        }
-
-        Optional<Book> existingBook = bookRepository.findByAuthor(book.getAuthor().toLowerCase().trim());
-        if (existingBook.isPresent()) {
-            existingBook.get().setAvailable(true);
-            throw new BookAlreadyAddedException("User with username " +book.getAuthor() + " already exists.");
-        }
+    public BookDeleteResponse deleteBooks(BookDeleteRequest newBookDeleteRequest) {
+        BookServicesImplementation bookServicesImplementation = new BookServicesImplementation(bookRepository);
+        return bookServicesImplementation.deleteBook(newBookDeleteRequest);
     }
 
-    public BookDeleteResponse removeBookByTitleAndAuthor(BookDeleteRequest bookDeleteRequest) {
-        Book book = bookDeleteRequestMap(bookDeleteRequest);
-        if (book.getTitle() == null || book.getTitle().trim().isEmpty() || book.getAuthor() == null || book.getAuthor().trim().isEmpty()) {
-            throw new IllegalArgumentException("Title and author cannot be null or empty.");
-        }
+    public LogoutAdminResponse logoutAdmin(LogOutAdminRequest newLogOutRequest) {
+        Admin admin = adminLoginOutMap(newLogOutRequest);
+        validateLogoutRequest(newLogOutRequest, admin);
+        return logOutAdminResponseMap(admin);
+    }
 
-        Optional<Book> existingBookOptional = bookRepository.findByTitleAndAuthor(book.getTitle(), book.getAuthor());
-        if (existingBookOptional.isPresent()) {
-            bookRepository.delete(existingBookOptional.get());
+    private void validateLogoutRequest(LogOutAdminRequest logOutRequest, Admin admin) {
+        AdminServicesImplementation.requestCheck(logOutRequest.getUsername(), logOutRequest.getPassword());
+        Optional<Admin> existingUserOptional = adminRepository.findByUsername(admin.getUsername());
+        if (existingUserOptional.isPresent()) {
+            Admin existinAdmin = existingUserOptional.get();
+            if (!Objects.equals(existinAdmin.getPassword(), logOutRequest.getPassword())) {
+                throw new WrongPasswordException("Account does not exist or Invalid password");
+            }
+            existinAdmin.setIsLoggedIn(false);
+            adminRepository.save(existinAdmin);
         } else {
-            throw new BookNotFoundException("Book with title \"" + book.getTitle() + "\" and author \"" + book.getAuthor() + "\" not found.");
+            throw new NoSuchElementException("User not found");
         }
-        return deleteResponseMap(book);
     }
-
-
-
-
 }
 

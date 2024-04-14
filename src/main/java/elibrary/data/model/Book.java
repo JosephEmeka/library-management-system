@@ -15,6 +15,6 @@ public class Book {
     private String description;
     private String publisher;
     private String isbn;
-    private boolean isAvailable = false;
+    private boolean isAvailable = true;
     private Categories category;
 }

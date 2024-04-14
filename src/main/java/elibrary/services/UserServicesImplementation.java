@@ -1,17 +1,18 @@
 package elibrary.services;
 
+import elibrary.data.model.Book;
+import elibrary.data.model.BorrowedBooks;
 import elibrary.data.model.User;
+import elibrary.data.repository.BookRepository;
+import elibrary.data.repository.BorrowedBooksRepository;
 import elibrary.data.repository.UserRepository;
-import elibrary.dtos_requests.LogOutRequest;
-import elibrary.dtos_requests.LoginRequest;
-import elibrary.dtos_requests.RegisterRequest;
-import elibrary.dtos_response.LoginResponse;
-import elibrary.dtos_response.LogoutResponse;
-import elibrary.dtos_response.RegisterResponse;
+import elibrary.dtos_requests.*;
+import elibrary.dtos_response.*;
 import elibrary.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,18 +21,25 @@ import static elibrary.utils.Mapper.*;
 
 @Service
 public class UserServicesImplementation implements UserServices{
-    private final UserRepository userRepository;
-@Autowired
-    public UserServicesImplementation(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    @Autowired
+        private  BorrowedBooksRepository borrowedBooksRepository;
+    @Autowired
+        private BookRepository bookRepository;
+        private final UserRepository userRepository;
+        @Autowired
+        private BorrowedBookServicesImplementation borrowedBookServices;
+
+        @Autowired
+        public UserServicesImplementation(UserRepository userRepository) {
+            this.userRepository = userRepository;
+
+        }
 
 
-    public void saveUser(User user) {
-        userRepository.save(user);
-    }
 
-    @Override
+
+
+        @Override
     public RegisterResponse registerUser(RegisterRequest newUserRegistrationRequest) {
         User user = RegisterRequestMap(newUserRegistrationRequest);
         validateUser(user);
@@ -112,5 +120,21 @@ public class UserServicesImplementation implements UserServices{
         }
     }
 
+
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
+    public List<BorrowedBooks> getAllBorrowedBooks(BorrowedBookRegisterRequest borrowBookRequest) {
+        return borrowedBooksRepository.findAllByBorrowerUsername(borrowBookRequest.getBorrowerUserName());
+    }
+
+    public BorrowedBookRegisterResponse borrowBooks(BorrowedBookRegisterRequest newBorrowedBookRegistrationRequest) {
+        return borrowedBookServices.addBorrowedBook(newBorrowedBookRegistrationRequest);
+    }
+
+    public BorrowedBookDeleteResponse deleteBook(BorrowedBookDeleteRequest deleteBookRequest) {
+        return borrowedBookServices.returnBorrowedBook(deleteBookRequest);
+    }
 
 }
