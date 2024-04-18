@@ -4,7 +4,7 @@ import elibrary.data.model.Book;
 import elibrary.data.model.BorrowedBooks;
 import elibrary.dtos_requests.*;
 import elibrary.dtos_response.ApiResponse;
-import elibrary.services.UserServicesImplementation;
+import elibrary.services.UserServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +17,9 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
     @RestController
     @RequestMapping("/elibrary")
     public class UserServicesControllers{
-        private final UserServicesImplementation userServices;
-
         @Autowired
-        public UserServicesControllers(UserServicesImplementation userServices) {
-            this.userServices = userServices;
-        }
+        private UserServices userServices;
+
 
 
         @PostMapping("/registerUser")

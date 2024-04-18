@@ -31,7 +31,7 @@ public class BorrowedBookServicesImplementation implements BorrowedBookServices 
         this.bookRepository = bookRepository;
     }
 
-
+@Override
     public BorrowedBookRegisterResponse addBorrowedBook(BorrowedBookRegisterRequest newBookRegistrationRequest) {
         BorrowedBooks bookToBeBorrowed = borrowedBookRequestMap(newBookRegistrationRequest);
         validateBorrowedBook(bookToBeBorrowed);
@@ -61,7 +61,7 @@ public class BorrowedBookServicesImplementation implements BorrowedBookServices 
         }
     }
 
-
+@Override
     public BorrowedBookDeleteResponse returnBorrowedBook(BorrowedBookDeleteRequest borrowedBookDeleteRequest) {
         if (borrowedBookDeleteRequest.getTitle() == null || borrowedBookDeleteRequest.getTitle().isEmpty() || borrowedBookDeleteRequest.getAuthor() == null || borrowedBookDeleteRequest.getAuthor().isEmpty() || borrowedBookDeleteRequest.getBorrowerUserName() == null || borrowedBookDeleteRequest.getBorrowerUserName().isEmpty()) {
             throw new EmptyRegistrationEntryException("Book details cannot be empty.");

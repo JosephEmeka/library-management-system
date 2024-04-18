@@ -27,7 +27,7 @@ public class UserServicesImplementation implements UserServices{
         private BookRepository bookRepository;
         private final UserRepository userRepository;
         @Autowired
-        private BorrowedBookServicesImplementation borrowedBookServices;
+        private BorrowedBookServices borrowedBookServices;
 
         @Autowired
         public UserServicesImplementation(UserRepository userRepository) {
@@ -49,12 +49,11 @@ public class UserServicesImplementation implements UserServices{
 
     @Override
     public LoginResponse loginUser(LoginRequest loginRequest) {
-        User user = userLoginMap(loginRequest);
-        validateLoginRequest(loginRequest, user);
-        return userLoginResponseMap(user);
+        validateLoginRequest(loginRequest);
+        return userLoginResponseMap(validateLoginRequest(loginRequest));
     }
 
-    private void validateLoginRequest(LoginRequest loginRequest, User user) {
+    private User validateLoginRequest(LoginRequest loginRequest) {
         if (loginRequest.getUsername() == null || loginRequest.getUsername().isEmpty()) {
             throw new EmptyUserNameLoginException("User name cannot be empty.");
         }
@@ -64,14 +63,15 @@ public class UserServicesImplementation implements UserServices{
         if (loginRequest.getUsername().equals(" ") || loginRequest.getPassword().equals(" ")) {
             throw new WhiteSpaceException("User cannot enter white Space");
         }
-        Optional<User> existingUserOptional = userRepository.findByUserName(user.getUserName());
+        Optional<User> existingUserOptional = userRepository.findByUserName(loginRequest.getUsername());
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
             if (!Objects.equals(existingUser.getPassword(), loginRequest.getPassword())) {
-                throw new WrongPasswordException("Account does not exist or Invalid password");
+                throw new WrongPasswordException("Invalid password");
             }
             existingUser.setIsLoggedIn(true);
             userRepository.save(existingUser);
+            return existingUser;
         }
         else
         {
@@ -99,6 +99,8 @@ public class UserServicesImplementation implements UserServices{
             throw new DoubleUserRegistrationException("User with username " + user.getUserName() + " already exists.");
         }
     }
+
+    @Override
     public LogoutResponse logoutUser(LogOutRequest newLogOutRequest) {
         User user = userLogOutMap(newLogOutRequest);
         validateLogoutRequest(newLogOutRequest, user);
@@ -120,19 +122,19 @@ public class UserServicesImplementation implements UserServices{
         }
     }
 
-
+@Override
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
     }
-
+@Override
     public List<BorrowedBooks> getAllBorrowedBooks(BorrowedBookRegisterRequest borrowBookRequest) {
         return borrowedBooksRepository.findAllByBorrowerUsername(borrowBookRequest.getBorrowerUserName());
     }
-
+@Override
     public BorrowedBookRegisterResponse borrowBooks(BorrowedBookRegisterRequest newBorrowedBookRegistrationRequest) {
         return borrowedBookServices.addBorrowedBook(newBorrowedBookRegistrationRequest);
     }
-
+@Override
     public BorrowedBookDeleteResponse deleteBook(BorrowedBookDeleteRequest deleteBookRequest) {
         return borrowedBookServices.returnBorrowedBook(deleteBookRequest);
     }

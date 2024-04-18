@@ -22,13 +22,14 @@ import static elibrary.utils.Mapper.deleteResponseMap;
 
 @Service
 public class BookServicesImplementation implements BookServices {
-    private final BookRepository bookRepository;
+
+    private  final BookRepository bookRepository;
 
     @Autowired
     public BookServicesImplementation(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
-
+@Override
     public BookRegisterResponse addBook(BookRegisterRequest newBookRegistrationRequest) {
         Book newBook = bookRequestMap(newBookRegistrationRequest);
         validateBook(newBook);
@@ -50,7 +51,7 @@ public class BookServicesImplementation implements BookServices {
             throw new BookAlreadyAddedException("Book with author " + book.getAuthor() + " already exists.");
         }
     }
-
+@Override
     public BookDeleteResponse deleteBook(BookDeleteRequest bookDeleteRequest) {
         Optional<Book> book = bookRepository.findByAuthor(bookDeleteRequest.getAuthor().trim());
         if (book.isEmpty()) {

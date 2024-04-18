@@ -100,7 +100,7 @@ public class AdminServicesImplementation implements AdminServices {
             throw new WhiteSpaceException("User cannot enter white Space");
         }
     }
-
+@Override
     public BookRegisterResponse addBooks(BookRegisterRequest newBookRegistrationRequest) {
         BookServicesImplementation bookServicesImplementation = new BookServicesImplementation(bookRepository);
         bookServicesImplementation.addBook(newBookRegistrationRequest);
@@ -108,12 +108,12 @@ public class AdminServicesImplementation implements AdminServices {
         var newBook = newOptionalBook.get();
         return bookRegisterResponseMap(newBook);
     }
-
+@Override
     public BookDeleteResponse deleteBooks(BookDeleteRequest newBookDeleteRequest) {
         BookServicesImplementation bookServicesImplementation = new BookServicesImplementation(bookRepository);
         return bookServicesImplementation.deleteBook(newBookDeleteRequest);
     }
-
+@Override
     public LogoutAdminResponse logoutAdmin(LogOutAdminRequest newLogOutRequest) {
         Admin admin = adminLoginOutMap(newLogOutRequest);
         validateLogoutRequest(newLogOutRequest, admin);
