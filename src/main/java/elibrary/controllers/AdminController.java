@@ -3,13 +3,16 @@ package elibrary.controllers;
 
 import elibrary.dtos_requests.*;
 import elibrary.dtos_response.ApiResponse;
+import elibrary.dtos_response.UploadBookResponse;
 import elibrary.services.AdminServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController
 @RequestMapping("/elibrary")
@@ -73,6 +76,12 @@ public class AdminController {
                 return new ResponseEntity<>(new ApiResponse(false, e.getMessage()),
                         BAD_REQUEST);
             }
+        }
+
+    @PostMapping(consumes ={MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<UploadBookResponse> uploadMedia(@ModelAttribute UploadBookRequest  uploadBookRequest) {
+        return ResponseEntity.status(CREATED)
+                .body(adminServices.upload(uploadBookRequest));
         }
     }
 

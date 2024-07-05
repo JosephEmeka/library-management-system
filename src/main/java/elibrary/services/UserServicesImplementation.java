@@ -22,12 +22,12 @@ import static elibrary.utils.Mapper.*;
 @Service
 public class UserServicesImplementation implements UserServices{
     @Autowired
-        private  BorrowedBooksRepository borrowedBooksRepository;
+    private  BorrowedBooksRepository borrowedBooksRepository;
     @Autowired
-        private BookRepository bookRepository;
-        private final UserRepository userRepository;
-        @Autowired
-        private BorrowedBookServices borrowedBookServices;
+    private BookRepository bookRepository;
+    private final UserRepository userRepository;
+    @Autowired
+    private BorrowedBookServices borrowedBookServices;
 
         @Autowired
         public UserServicesImplementation(UserRepository userRepository) {

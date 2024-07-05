@@ -4,7 +4,7 @@ package elibrary.enums;
 import lombok.Getter;
 
 @Getter
-public enum Categories {
+public enum Category {
     FICTION("Fiction"),
     NON_FICTION("Non-Fiction"),
     MYSTERY("Mystery"),
@@ -25,7 +25,7 @@ public enum Categories {
 
     private final String displayName;
 
-    Categories(String displayName) {
+    Category(String displayName) {
         this.displayName = displayName;
     }
 

@@ -12,7 +12,5 @@ public interface AdminServices {
     BookRegisterResponse addBooks(BookRegisterRequest newBookRegistrationRequest);
     BookDeleteResponse deleteBooks(BookDeleteRequest newBookDeleteRequest);
     LogoutAdminResponse logoutAdmin(LogOutAdminRequest newLogOutRequest);
-
-
-
+    UploadBookResponse upload(UploadBookRequest uploadBookRequest);
 }

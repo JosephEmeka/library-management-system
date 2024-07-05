@@ -1,16 +1,21 @@
 package elibrary.services;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Uploader;
+import com.cloudinary.utils.ObjectUtils;
 import elibrary.data.model.Admin;
 import elibrary.data.model.Book;
-import elibrary.data.model.User;
 import elibrary.data.repository.AdminRepository;
 import elibrary.data.repository.BookRepository;
 import elibrary.dtos_requests.*;
 import elibrary.dtos_response.*;
 import elibrary.exceptions.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,18 +23,16 @@ import java.util.Optional;
 import static elibrary.utils.Mapper.*;
 
 @Service
+@AllArgsConstructor
 public class AdminServicesImplementation implements AdminServices {
-   private final AdminRepository adminRepository;
-   private final BookRepository bookRepository;
 
-    @Autowired
-    public AdminServicesImplementation(AdminRepository adminRepository, BookRepository bookRepository) {
-        this.adminRepository = adminRepository;
-        this.bookRepository = bookRepository;
-    }
+    private final AdminRepository adminRepository;
+    private final BookRepository bookRepository;
+    private final Cloudinary cloudinary;
+    private final ModelMapper modelMapper;
+
 
     @Override
-
     public RegisterResponse registerAdmin(RegisterRequest newUserRegistrationRequest) {
         Admin admin = AdminRegisterRequestMap(newUserRegistrationRequest);
         validateAdmin(admin);
@@ -120,6 +123,25 @@ public class AdminServicesImplementation implements AdminServices {
         return logOutAdminResponseMap(admin);
     }
 
+    @Override
+    public UploadBookResponse upload(UploadBookRequest uploadBookRequest) {
+      Admin admin = adminRepository.findByEmail(uploadBookRequest.getAdminEmail());
+        try{
+            Uploader uploader = cloudinary.uploader();
+            Map<? , ?> response = uploader.upload(uploadBookRequest.getMediaFile().getBytes(),
+                    ObjectUtils.asMap("resource_type", "auto"));
+            String url = response.get("url").toString();
+            Book book = modelMapper.map(uploadBookRequest, Book.class);
+            book.setBookUrl(url);
+            book.setUploader(admin.getAdminId());
+            book = bookRepository.save(book);
+            return modelMapper.map(book, UploadBookResponse.class);
+        }
+        catch(IOException exception) {
+            throw new BookUploadFailedException("Book upload failed");
+        }
+    }
+
     private void validateLogoutRequest(LogOutAdminRequest logOutRequest, Admin admin) {
         AdminServicesImplementation.requestCheck(logOutRequest.getUsername(), logOutRequest.getPassword());
         Optional<Admin> existingUserOptional = adminRepository.findByUsername(admin.getUsername());
@@ -134,5 +156,7 @@ public class AdminServicesImplementation implements AdminServices {
             throw new NoSuchElementException("User not found");
         }
     }
+
+
 }
 

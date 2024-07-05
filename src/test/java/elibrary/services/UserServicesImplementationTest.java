@@ -307,14 +307,14 @@ class UserServicesImplementationTest {
 //        newBookRegistrationRequest.setTitle("Title");
 //        newBookRegistrationRequest.setPublisher("johnson & johnson");
 //        newBookRegistrationRequest.setIsbn("23bnn432");
-//        newBookRegistrationRequest.setCategory(Categories.MYSTERY);
+//        newBookRegistrationRequest.setCategory(Category.MYSTERY);
 //        userServicesImplementation.borrowBooks(newBookRegistrationRequest);
 //        var secondBookRegistrationRequest = new BookRegisterRequest();
 //        secondBookRegistrationRequest.setAuthor("Sam");
 //        secondBookRegistrationRequest.setTitle("The Little Mermaid");
 //        secondBookRegistrationRequest.setPublisher("johnson & johnson");
 //        secondBookRegistrationRequest.setIsbn("23bnR432");
-//        secondBookRegistrationRequest.setCategory(Categories.SCIENCE_FICTION);
+//        secondBookRegistrationRequest.setCategory(Category.SCIENCE_FICTION);
 //        userServicesImplementation.borrowBooks(secondBookRegistrationRequest);
 //        assertEquals(2, bookRepository.count());
 //        assertEquals(userServicesImplementation.getAllBooks(), bookRepository.findAll());

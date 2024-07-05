@@ -1,6 +1,6 @@
 package elibrary.dtos_requests;
 
-import elibrary.enums.Categories;
+import elibrary.enums.Category;
 import lombok.Data;
 
 @Data
@@ -12,5 +12,5 @@ public class BookRegisterRequest {
     private String publisher;
     private String isbn;
     private boolean isAvailable = true;
-    private Categories category;
+    private Category category;
 }
