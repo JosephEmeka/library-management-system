@@ -20,8 +20,7 @@ import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static elibrary.utils.TestUtils.TEST_BOOK_COVER_PAGE_LOCATION;
-import static elibrary.utils.TestUtils.buildUploadMediaRequest;
+import static elibrary.utils.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
@@ -42,13 +41,13 @@ class AdminServicesImplementationTest {
     @Test
     void testAdminCanBeRegistered(){
         RegisterRequest newUserRegistrationRequest = new RegisterRequest();
-        newUserRegistrationRequest.setFirstName("Johnny");
-        newUserRegistrationRequest.setLastName("Joe");
-        newUserRegistrationRequest.setUserName("google-man");
-        newUserRegistrationRequest.setEmail("google-man@gmail.com");
-        newUserRegistrationRequest.setPassword("passworded");
+        newUserRegistrationRequest.setFirstName("Dolapo");
+        newUserRegistrationRequest.setLastName("Deolu");
+        newUserRegistrationRequest.setUserName("fresh-man");
+        newUserRegistrationRequest.setEmail("freshman@gmail.com");
+        newUserRegistrationRequest.setPassword("passworder");
         adminServices.registerAdmin(newUserRegistrationRequest);
-        assertEquals(1, adminRepository.count());
+        assertEquals(2, adminRepository.count());
     }
 
     @Test
@@ -60,7 +59,7 @@ class AdminServicesImplementationTest {
         newUserRegistrationRequest.setEmail("google-man@gmail.com");
         newUserRegistrationRequest.setPassword("passworded");
         assertThrows(EmptyUserNameRegistrationException.class, ()->adminServices.registerAdmin(newUserRegistrationRequest));
-        assertEquals(1, adminRepository.count());
+        assertEquals(2, adminRepository.count());
     }
     @Test
     void testAdminWithEmptyLastNameCannotBeRegistered_numberOfUsersZero() {
@@ -71,7 +70,7 @@ class AdminServicesImplementationTest {
         newUserRegistrationRequest.setEmail("google-man@gmail.com");
         newUserRegistrationRequest.setPassword("passworded");;
         assertThrows(EmptyLastNameRegistrationException.class, ()->adminServices.registerAdmin(newUserRegistrationRequest));
-        assertEquals(1, adminRepository.count());
+        assertEquals(2, adminRepository.count());
     }
 
     @Test
@@ -83,7 +82,7 @@ class AdminServicesImplementationTest {
         newUserRegistrationRequest.setEmail("google-man@gmail.com");
         newUserRegistrationRequest.setPassword("passworded");
         assertThrows(EmptyFirstNameRegistrationException.class, ()->adminServices.registerAdmin(newUserRegistrationRequest));
-        assertEquals(1, adminRepository.count());
+        assertEquals(2, adminRepository.count());
     }
 
     @Test
@@ -95,7 +94,7 @@ class AdminServicesImplementationTest {
         newUserRegistrationRequest.setEmail(" ");
         newUserRegistrationRequest.setPassword(" ");
         assertThrows(WhiteSpaceException.class, ()->adminServices.registerAdmin(newUserRegistrationRequest));
-        assertEquals(1, adminRepository.count());
+        assertEquals(2, adminRepository.count());
     }
 
 
@@ -103,22 +102,22 @@ class AdminServicesImplementationTest {
     @Test
     void twoAdminCanBeRegistered_numberOfUsersTwo() {
         RegisterRequest newUserRegistrationRequest = new RegisterRequest();
-        newUserRegistrationRequest.setFirstName("Johnny");
-        newUserRegistrationRequest.setLastName("Joe");
-        newUserRegistrationRequest.setUserName("google-man");
-        newUserRegistrationRequest.setEmail("google-man@gmail.com");
-        newUserRegistrationRequest.setPassword("passworded");
+        newUserRegistrationRequest.setFirstName("Ade");
+        newUserRegistrationRequest.setLastName("Yamal");
+        newUserRegistrationRequest.setUserName("yalman");
+        newUserRegistrationRequest.setEmail("yalman@gmail.com");
+        newUserRegistrationRequest.setPassword("passwordy");
         adminServices.registerAdmin(newUserRegistrationRequest);
 
         RegisterRequest secondUserRegistrationRequest = new RegisterRequest();
-        secondUserRegistrationRequest.setFirstName("McJohnny");
-        secondUserRegistrationRequest.setLastName("Joey");
-        secondUserRegistrationRequest.setUserName("twitter-man");
-        secondUserRegistrationRequest.setEmail("twitter-man@gmail.com");
-        secondUserRegistrationRequest.setPassword("not-passworded");
+        secondUserRegistrationRequest.setFirstName("McSample");
+        secondUserRegistrationRequest.setLastName("simple");
+        secondUserRegistrationRequest.setUserName("simps");
+        secondUserRegistrationRequest.setEmail("simps@gmail.com");
+        secondUserRegistrationRequest.setPassword("nopassworded");
 
         adminServices.registerAdmin(secondUserRegistrationRequest);
-        assertEquals(2, adminRepository.count());
+        assertEquals(4, adminRepository.count());
     }
 
     @Test
@@ -129,9 +128,8 @@ class AdminServicesImplementationTest {
         newUserRegistrationRequest.setUserName("google-man");
         newUserRegistrationRequest.setEmail("google-man@gmail.com");
         newUserRegistrationRequest.setPassword("passworded");
-        adminServices.registerAdmin(newUserRegistrationRequest);
         assertThrows(DoubleUserRegistrationException.class, () -> adminServices.registerAdmin(newUserRegistrationRequest));
-        assertEquals(1, adminRepository.count());
+        assertEquals(4, adminRepository.count());
     }
 
     @Test
@@ -180,21 +178,21 @@ class AdminServicesImplementationTest {
         newUserRegistrationRequest.setPassword("PASSWORD");
         Optional<Admin> findUser = adminRepository.findByUsername("geogle-man");
         assertFalse(findUser.isPresent());
-        assertThrows(NoSuchElementException.class, ()-> adminServices.loginAdmin(newLoginRequest));
+        assertThrows(AlreadyLoggedInException.class, ()-> adminServices.loginAdmin(newLoginRequest));
     }
     @Test
     void testUserCannotBeLoggedInWithWrongPassword(){
         RegisterRequest newAdminRegistrationRequest = new RegisterRequest();
-        newAdminRegistrationRequest.setFirstName("Johnny");
-        newAdminRegistrationRequest.setLastName("Joe");
-        newAdminRegistrationRequest.setUserName("google-man");
-        newAdminRegistrationRequest.setEmail("google-man@gmail.com");
-        newAdminRegistrationRequest.setPassword("PASSWORD");
+        newAdminRegistrationRequest.setFirstName("samson");
+        newAdminRegistrationRequest.setLastName("emmanuel");
+        newAdminRegistrationRequest.setUserName("gman");
+        newAdminRegistrationRequest.setEmail("gman@gmail.com");
+        newAdminRegistrationRequest.setPassword("PASSWORDsssss");
         adminServices.registerAdmin(newAdminRegistrationRequest);
         LoginRequest newLoginRequest = new LoginRequest();
-        newLoginRequest.setUsername("google-man");
-        newLoginRequest.setPassword("PASSWORDED");
-        Optional<Admin> findUser = adminRepository.findByUsername("google-man");
+        newLoginRequest.setUsername("gman");
+        newLoginRequest.setPassword("PASSWORDEDssss");
+        Optional<Admin> findUser = adminRepository.findByUsername("gman");
         assertTrue(findUser.isPresent());
         assertThrows(WrongPasswordException.class, ()->adminServices.loginAdmin(newLoginRequest));
     }
@@ -377,5 +375,13 @@ class AdminServicesImplementationTest {
     }
 
     @Test
-    void testSameBookCannotBeUploadedAddedTwice(){}
+    void testSameBookCannotBeUploadedAddedTwice() throws IOException {
+        Path path = Paths.get(TEST_SECOND_BOOK_COVER_PAGE_LOCATION);
+        var inputStream = Files.newInputStream(path);
+            UploadBookRequest request = buildUploadMediaRequest(inputStream);
+            UploadBookResponse secondUpload = adminServices.upload(request);
+            assertThat(secondUpload).isNotNull();
+            assertThrows(BookAlreadyAddedException.class, ()->adminServices.upload(request));
+            assertThat(secondUpload.getUrl()).isNotNull();
+    }
 }

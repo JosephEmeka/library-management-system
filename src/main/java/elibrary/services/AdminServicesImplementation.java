@@ -126,19 +126,24 @@ public class AdminServicesImplementation implements AdminServices {
     @Override
     public UploadBookResponse upload(UploadBookRequest uploadBookRequest) {
       Admin admin = adminRepository.findByEmail(uploadBookRequest.getAdminEmail());
-        try{
-            Uploader uploader = cloudinary.uploader();
-            Map<? , ?> response = uploader.upload(uploadBookRequest.getMediaFile().getBytes(),
-                    ObjectUtils.asMap("resource_type", "auto"));
-            String url = response.get("url").toString();
-            Book book = modelMapper.map(uploadBookRequest, Book.class);
-            book.setBookUrl(url);
-            book.setUploader(admin.getAdminId());
-            book = bookRepository.save(book);
-            return modelMapper.map(book, UploadBookResponse.class);
+      Optional<Book> book = bookRepository.findByTitleAndAuthor(uploadBookRequest.getTitle(), uploadBookRequest.getAuthor());
+        if (book.isEmpty()) {
+            try {
+                Uploader uploader = cloudinary.uploader();
+                Map<?, ?> response = uploader.upload(uploadBookRequest.getMediaFile().getBytes(),
+                        ObjectUtils.asMap("resource_type", "auto"));
+                String url = response.get("url").toString();
+                Book newBook = modelMapper.map(uploadBookRequest, Book.class);
+                newBook.setBookUrl(url);
+                newBook.setUploader(admin.getAdminId());
+                newBook = bookRepository.save(newBook);
+                return modelMapper.map(newBook, UploadBookResponse.class);
+            } catch (IOException exception) {
+                throw new BookUploadFailedException("Book upload failed");
+            }
         }
-        catch(IOException exception) {
-            throw new BookUploadFailedException("Book upload failed");
+        else{
+            throw new BookAlreadyAddedException("Book already added");
         }
     }
 

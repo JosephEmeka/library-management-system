@@ -160,7 +160,6 @@ public class Mapper {
         borrowedBookDeleteResponse.setAuthor(borrowedBooks.getAuthor());
         borrowedBookDeleteResponse.setTitle(borrowedBooks.getTitle());
         return borrowedBookDeleteResponse;
-
     }
 }
 
